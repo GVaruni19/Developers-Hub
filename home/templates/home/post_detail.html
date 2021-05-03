@@ -1,0 +1,82 @@
+{% extends 'users/base.html' %}
+
+  {% block body %}
+  <style>
+    .article-img {
+            border-radius: 9em;
+            border: .5px solid black;
+            background-color: #eee;
+          }
+  </style>
+        <article class="media content-section" class="item">
+                <img class="article-img rounded-circle my-2" src="{{ post.author.account.userImage.url }}"></img>
+                <div class="media-body ml-2 w3-round">
+                  <div class="article-metadata">
+                    <a class="mr-2" href="{% url 'account' post.author.id %}">{{ post.author|title }}</a>
+                    <small class="text-muted">{{ post.category|title }}</small>
+                    <small class="text-muted" style="float:right;">{{ post.date_posted|date:"F d, Y" }}</small>
+                  </div>
+                  <h4></h4>
+                  <h4><a class="article-title" href="{% url 'post-detail' post.id %}">{{ post.title|title }}</a></h4>
+                  <p class="article-content">{{post.content|safe}}</p>
+                </div>
+              </article>
+        {% if object.author == user %}
+          <div>
+            {% if object.done == False %}
+              <a class="btn btn-outline-secondary bt-sm mt-1 mb-2" href="{% url 'post-update' object.id %}">
+              <i class="fas fa-edit"></i> Update</a>
+            {% else %}
+               <button type="button" style="float: right;"class="btn btn-success active"><i class="fas fa-check"></i> Completed</button>
+            {% endif %}
+            <a class="btn btn-outline-danger bt-sm mt-1 mb-2" data-target="#deleteModal" data-toggle="modal" >
+            <i class="fas fa-trash"></i> Delete</a>
+          </div>
+              <div class="modal" tabindex="-1" role="dialog" id="deleteModal">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title"><i class="fas fa-trash"></i> Delete Post</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          <p>Are you sure you want to delete this post?</p>
+                        </div>
+                        <div class="modal-footer">
+                          <a class="btn btn-danger" href="{% url 'post-delete' object.id %}">
+                          <i class="fas fa-trash"></i>
+                        Delete</a>
+                          <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="far fa-window-close"></i> Close</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+        {% endif %}
+        {% if object.assign_to %}
+            <a href="#" class="btn btn-dark active " style="float: right;" role="button" aria-pressed="true">Assigned to <i class="fas fa-arrow-right"></i> {{ object.assign_to }}</a>
+            <br>
+        {% endif %}
+        <br>
+        <hr>    
+        <h2>Comment Section</h2>
+            {% if user.is_authenticated %}
+                <a class="btn btn-primary my-4" href="{% url 'add-comment' post.pk %}"><i class="fas fa-plus"></i> Add a comment</a>
+            {% else %}
+                <a class="btn btn-primary my-4" href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Login to comment</a>
+            {% endif %}
+            <br>
+            
+            {% for comment in post.comments.all %}
+                <p>
+                    <a href="{% url 'account' comment.author.id %}">{{ comment.author }}</a> - <small class="text-muted"> {{ comment.date_added }}</small> 
+                <br>
+                <!-- <a href="{% url 'account' comment.author.id %}">Delete</a> -->
+                {{ comment.body }}</p>
+                
+            {% endfor %}
+            <hr>
+    <br>
+      
+  {% endblock %}
